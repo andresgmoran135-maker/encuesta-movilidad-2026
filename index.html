@@ -1,0 +1,180 @@
+<!doctype html><html lang="es"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Encuesta anónima de movilidad 2026</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+:root{--p:#673ab7;--bg:#f0ebf8;--b:#dadce0;--bad:#b3261e;--ok:#137333}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font:15px Arial;color:#202124}.top{height:10px;background:var(--p)}
+.wrap{max-width:980px;margin:24px auto;padding:0 14px}.card{background:#fff;border:1px solid var(--b);border-radius:10px;padding:22px;margin:14px 0}
+h1{font-size:26px;margin:0 0 10px}h2{font-size:20px}.note{color:#5f6368;line-height:1.5}.bad{color:var(--bad)}.ok{color:var(--ok)}
+input,select,button{font:inherit}input[type=text],input[type=number],select{width:100%;padding:10px;border:1px solid #bbb;border-radius:6px}
+button{border:0;border-radius:6px;padding:11px 18px;cursor:pointer}.primary{background:var(--p);color:#fff}.secondary{background:#eee}
+.hidden{display:none!important}.actions{display:flex;justify-content:space-between;gap:10px;margin-top:18px}.progress{height:8px;background:#ddd;border-radius:8px;overflow:hidden}.bar{height:100%;background:var(--p);width:25%}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{border:1px solid #ddd;padding:7px;text-align:center}th{background:#f7f5fb}.scroll{overflow:auto}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.route{border:1px solid #ddd;border-radius:8px;padding:14px;margin:12px 0}.point{border-left:4px solid var(--p);padding:12px;margin:10px 0;background:#fafafa}
+.map{height:270px;border-radius:8px;margin-top:8px}.choice{display:flex;gap:16px;flex-wrap:wrap;margin:10px 0}.choice label{display:flex;gap:6px;align-items:center}
+@media(max-width:720px){.grid{grid-template-columns:1fr}.card{padding:15px}table{font-size:12px}}
+</style></head><body><div class="top"></div><div class="wrap">
+<div class="card"><h1>Encuesta anónima de movilidad 2026</h1>
+<p class="note">Registre su asistencia presencial y los medios de transporte utilizados para desplazarse al trabajo. No se solicita información de identificación personal.</p>
+<div class="progress"><div class="bar" id="bar"></div></div></div>
+<form name="movilidad-2026-v43" method="POST" action="/" data-netlify="true" netlify-honeypot="bot-field" id="form">
+<input type="hidden" name="form-name" value="movilidad-2026-v43"><input type="hidden" name="datos_json" id="datos_json"><p class="hidden"><input name="bot-field"></p>
+
+<section id="s1"><div class="card"><h2>1. Domicilio habitual y asistencia</h2>
+<p class="note">Indique su domicilio habitual. Este será automáticamente el punto de salida en la ida y el punto final en el retorno. No volveremos a preguntarlo en las rutas.</p>
+<label><b>Dirección o referencia de su domicilio</b><input id="homeText" type="text" placeholder="Ej.: Av. Los Héroes 123, San Juan de Miraflores, Lima" enterkeyhint="search"></label>
+<div class="grid" style="margin-top:8px"><button type="button" class="secondary" onclick="findHome()">Buscar dirección</button><span id="homeMsg" class="note"></span></div>
+<div id="homeMap" class="map"></div>
+<h3>Asistencia presencial 2026</h3><p class="note">Indique los días presenciales y, de ellos, cuántos utilizó movilidad de la empresa en ida y retorno.</p>
+<div class="scroll"><table><thead><tr><th>Mes</th><th>Días laborables</th><th>Días presenciales</th><th>Movilidad empresa ida</th><th>Movilidad empresa retorno</th></tr></thead><tbody id="months"></tbody></table></div>
+<div id="e1" class="bad"></div><div class="actions"><span></span><button type="button" class="primary" onclick="next1()">Siguiente</button></div></div></section>
+
+<section id="s2" class="hidden"><div class="card"><h2>2. Días por lugar de trabajo</h2>
+<p class="note">Indique si durante cada mes trabajó en uno, dos o tres lugares. Si trabajó en un solo lugar, los días presenciales se asignarán automáticamente a ese lugar. Si trabajó en dos o tres, distribuya únicamente los días entre los lugares utilizados.</p>
+<div id="sites"></div><div id="e2" class="bad"></div><div class="actions"><button type="button" class="secondary" onclick="go(1)">Anterior</button><button type="button" class="primary" onclick="next2()">Siguiente</button></div></div></section>
+
+<section id="s3" class="hidden"><div class="card"><h2>3. Viajes habituales</h2>
+<p class="note">Complete únicamente los lugares a los que asistió. Biofábrica, Planta CIRC y Coworking son destinos conocidos por la empresa, por lo que no debe volver a registrar su ubicación. Cada sección incluye ida y retorno y permite como máximo dos paradas intermedias.</p>
+<div id="trips"></div><div id="e3" class="bad"></div><div class="actions"><button type="button" class="secondary" onclick="go(2)">Anterior</button><button type="button" class="primary" onclick="sendForm()">Enviar encuesta</button></div></div></section>
+<button type="submit" id="nativeSubmit" class="hidden">Enviar</button></form>
+<section id="successBox" class="hidden">
+<div class="card" style="text-align:center;padding:38px">
+<h1>Sus datos fueron registrados exitosamente</h1>
+<p class="note">Gracias por completar la encuesta anónima de movilidad 2026.</p>
+<p class="ok"><b>La respuesta fue enviada correctamente.</b></p>
+</div>
+</section>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script>
+const months=[["Enero",26],["Febrero",24],["Marzo",24],["Abril",26],["Mayo",24],["Junio",26],["Julio",24],["Agosto",24],["Septiembre",26],["Octubre",26],["Noviembre",24],["Diciembre",24]];
+const modes=["A pie","Bicicleta","Bicicleta eléctrica","Scooter","Scooter eléctrico","Automóvil propio","Motocicleta","Mototaxi","Taxi individual","Taxi compartido o carpool","Combi","Cúster o microbús","Autobús","Corredor complementario","Metropolitano","Metro de Lima","Movilidad de la empresa","Otro"];
+const fixed={bio:{name:"Biofábrica",lat:-12.219597,lng:-76.936306},circ:{name:"Planta CIRC",lat:-12.219215,lng:-76.936050}};
+let S={home:{text:"",lat:null,lng:null},months:[],sites:{},trips:{}};let maps={},marks={};
+months.forEach((m,i)=>document.getElementById("months").insertAdjacentHTML("beforeend",`<tr><td>${m[0]}</td><td>${m[1]}</td><td><input id="p${i}" type="number" min="0" max="${m[1]}" value="${m[1]}"></td><td><input id="i${i}" type="number" min="0" value="${m[1]}"></td><td><input id="r${i}" type="number" min="0" value="${m[1]}"></td></tr>`));
+function mkMap(id,click){let m=L.map(id).setView([-12.10,-77.02],10);L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap"}).addTo(m);if(click)m.on("click",e=>click(e.latlng));maps[id]=m;return m}
+let hm=mkMap("homeMap",ll=>setHome(ll.lat,ll.lng));
+function setHome(lat,lng){S.home.lat=lat;S.home.lng=lng;if(marks.home)marks.home.setLatLng([lat,lng]);else marks.home=L.marker([lat,lng],{draggable:true}).addTo(hm).on("dragend",e=>{let x=e.target.getLatLng();S.home.lat=x.lat;S.home.lng=x.lng;save()});hm.setView([lat,lng],15);homeMsg.innerHTML='<span class="ok">Domicilio ubicado. Puede mover el marcador para corregirlo.</span>';save()}
+async function geo(q){let r=await fetch("https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=pe&q="+encodeURIComponent(q));if(!r.ok)throw 0;let d=await r.json();return d[0]}
+async function findHome(){let q=homeText.value.trim();if(!q){homeMsg.innerHTML='<span class="bad">Escriba una dirección o marque el domicilio en el mapa.</span>';return}homeMsg.textContent="Buscando…";try{let d=await geo(q);if(!d){homeMsg.innerHTML='<span class="bad">No encontramos la dirección. Corríjala o marque el punto directamente en el mapa.</span>';return}S.home.text=q;setHome(+d.lat,+d.lon)}catch(e){homeMsg.innerHTML='<span class="bad">No fue posible buscar ahora. Puede marcar el domicilio directamente en el mapa.</span>'}}
+homeText.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();findHome()}});
+function go(n){["s1","s2","s3"].forEach(x=>document.getElementById(x).classList.add("hidden"));document.getElementById("s"+n).classList.remove("hidden");bar.style.width=(n*33.33)+"%";scrollTo(0,0);setTimeout(()=>Object.values(maps).forEach(m=>m.invalidateSize()),100)}
+function val(id){return +(document.getElementById(id)?.value||0)}
+function next1(){let e=[];S.home.text=homeText.value.trim();if(S.home.lat===null)e.push("Ubique su domicilio mediante la búsqueda o marcándolo en el mapa.");S.months=[];months.forEach((m,x)=>{let p=val("p"+x),i=val("i"+x),r=val("r"+x);if(p>m[1])e.push(`${m[0]}: los días presenciales superan los días laborables.`);if(i>p||r>p)e.push(`${m[0]}: la movilidad de empresa no puede superar los días presenciales.`);S.months.push({month:m[0],working:m[1],present:p,companyOut:i,companyBack:r})});e1.innerHTML=e.join("<br>");if(!e.length){renderSites();go(2)}}
+function renderSites(){
+  sites.innerHTML="";S.sites=S.sites||{};
+  S.months.filter(x=>x.present).forEach((m,k)=>{
+    sites.insertAdjacentHTML("beforeend",`<div class="route" id="site-${k}">
+      <b>${m.month}: ${m.present} días presenciales</b>
+      <p class="note">¿En cuántos lugares trabajó presencialmente durante este mes?</p>
+      <select id="count-${k}" onchange="renderMonthPlaces(${k},'${m.month}',${m.present})">
+        <option value="1">En un solo lugar</option>
+        <option value="2">En dos lugares</option>
+        <option value="3">En los tres lugares</option>
+      </select>
+      <div id="places-${k}"></div><div id="bal${k}" class="bad"></div>
+    </div>`);
+    renderMonthPlaces(k,m.month,m.present);
+  });
+}
+function placeOptions(exclude=[]){
+  return [["bio","Biofábrica"],["circ","Planta CIRC"],["cow","Coworking"]]
+    .filter(x=>!exclude.includes(x[0])).map(x=>`<option value="${x[0]}">${x[1]}</option>`).join("");
+}
+function renderMonthPlaces(k,month,present){
+  const count=+document.getElementById("count-"+k).value,box=document.getElementById("places-"+k);
+  box.innerHTML="";
+  for(let j=0;j<count;j++){
+    box.insertAdjacentHTML("beforeend",`<div class="grid" style="margin-top:10px">
+      <label>${j===0?"Lugar principal":"Lugar "+(j+1)}
+        <select class="placeSel" data-k="${k}" data-j="${j}" onchange="syncPlaceRows(${k},${present})">${placeOptions()}</select>
+      </label>
+      <label>Días en este lugar
+        <input class="placeDays" data-k="${k}" data-j="${j}" type="number" min="0" max="${present}" value="${j===0?present:0}" oninput="balanceAdaptive(${k},${present})">
+      </label>
+    </div>`);
+  }
+  syncPlaceRows(k,present);
+}
+function syncPlaceRows(k,present){
+  const sels=[...document.querySelectorAll(`.placeSel[data-k="${k}"]`)];
+  sels.forEach((s,idx)=>{
+    const current=s.value,other=sels.filter((_,j)=>j!==idx).map(x=>x.value);
+    s.innerHTML=placeOptions(other);
+    if([...s.options].some(o=>o.value===current))s.value=current;
+  });
+  balanceAdaptive(k,present);
+}
+function balanceAdaptive(k,present){
+  const days=[...document.querySelectorAll(`.placeDays[data-k="${k}"]`)];
+  if(days.length===1){days[0].value=present;days[0].readOnly=true}
+  else{
+    days[0].readOnly=true;
+    const others=days.slice(1).reduce((a,x)=>a+(+x.value||0),0);
+    days[0].value=Math.max(0,present-others);
+  }
+  const total=days.reduce((a,x)=>a+(+x.value||0),0),b=document.getElementById("bal"+k);
+  b.textContent=total===present?`Total asignado: ${total} de ${present} días.`:`Debe asignar exactamente ${present} días. Actualmente: ${total}.`;
+  b.className=total===present?"ok":"bad";
+}
+function next2(){
+  let e=[];S.sites={};const active=S.months.filter(x=>x.present);
+  active.forEach((m,k)=>{
+    let o={bio:0,circ:0,cow:0};
+    const sels=[...document.querySelectorAll(`.placeSel[data-k="${k}"]`)],days=[...document.querySelectorAll(`.placeDays[data-k="${k}"]`)];
+    const chosen=sels.map(x=>x.value);
+    if(new Set(chosen).size!==chosen.length)e.push(`${m.month}: no repita el mismo lugar.`);
+    sels.forEach((s,j)=>o[s.value]=+days[j].value||0);
+    if(Object.values(o).reduce((a,b)=>a+b,0)!==m.present)e.push(`${m.month}: distribuya exactamente ${m.present} días.`);
+    S.sites[m.month]=o;
+  });
+  e2.innerHTML=e.join("<br>");if(!e.length){renderTrips();go(3)}
+}
+function used(key){return Object.values(S.sites).some(x=>x[key]>0)}
+function renderTrips(){trips.innerHTML="";S.trips={};if(used("bio"))tripSection("bio","Viaje a Biofábrica");if(used("circ"))tripSection("circ","Viaje a Planta CIRC");if(used("cow"))tripSection("cow","Viaje a Coworking");}
+function tripSection(key,title){S.trips[key]={destination:key==="bio"?fixed.bio:key==="circ"?fixed.circ:{name:"Coworking",known:true},out:{stops:[]},sameReturn:true,back:{stops:[]}};let known=true;trips.insertAdjacentHTML("beforeend",`<div class="route" id="trip-${key}"><h2>${title}</h2>${known?`<p class="note">El destino final ya está registrado en el sistema. No necesita escribir ni señalar su ubicación.</p>`:`<div class="point"><b>Destino final: Coworking</b><label>Dirección del coworking<input id="cowText" type="text" placeholder="Escriba la dirección o referencia"></label><button type="button" class="secondary" onclick="findCow()">Buscar dirección</button><span id="cowMsg" class="note"></span><div id="cowMap" class="map"></div></div>`}
+<h3>Ida: domicilio → ${known?(key==="bio"?"Biofábrica":"Planta CIRC"):"Coworking"}</h3>${legHTML(key,"out")}
+<div class="point"><b>Retorno</b><p>¿Regresó utilizando exactamente la misma ruta y los mismos medios de transporte?</p><div class="choice"><label><input type="radio" name="ret-${key}" value="yes" checked onchange="ret('${key}',true)"> Sí</label><label><input type="radio" name="ret-${key}" value="no" onchange="ret('${key}',false)"> No</label></div></div><div id="back-${key}" class="hidden"><h3>Retorno: destino → domicilio</h3>${legHTML(key,"back")}</div></div>`);
+setTimeout(()=>{initStopMaps(key,"out");},50)}
+function legHTML(key,dir){return `<div class="point"><b>Tramo 1</b><label>Medio desde ${dir==="out"?"domicilio":"lugar de trabajo"}<select id="${key}-${dir}-m1">${modes.map(x=>`<option>${x}</option>`).join("")}</select></label><p>¿Realizó una parada/cambio antes de continuar?</p><select id="${key}-${dir}-q1" onchange="stopToggle('${key}','${dir}',1)"><option value="no">No</option><option value="yes">Sí</option></select></div>
+<div id="${key}-${dir}-s1" class="point hidden"><b>Primera parada</b><label>Dirección o referencia<input id="${key}-${dir}-a1" type="text"></label><button type="button" class="secondary" onclick="findStop('${key}','${dir}',1)">Buscar</button><span id="${key}-${dir}-msg1"></span><div id="${key}-${dir}-map1" class="map"></div><label>Medio después de esta parada<select id="${key}-${dir}-m2">${modes.map(x=>`<option>${x}</option>`).join("")}</select></label><p>¿Realizó una segunda parada/cambio?</p><select id="${key}-${dir}-q2" onchange="stopToggle('${key}','${dir}',2)"><option value="no">No</option><option value="yes">Sí</option></select></div>
+<div id="${key}-${dir}-s2" class="point hidden"><b>Segunda parada</b><label>Dirección o referencia<input id="${key}-${dir}-a2" type="text"></label><button type="button" class="secondary" onclick="findStop('${key}','${dir}',2)">Buscar</button><span id="${key}-${dir}-msg2"></span><div id="${key}-${dir}-map2" class="map"></div><label>Medio después de esta parada<select id="${key}-${dir}-m3">${modes.map(x=>`<option>${x}</option>`).join("")}</select></label></div>`}
+function initStopMaps(key,dir){[1,2].forEach(n=>{let id=`${key}-${dir}-map${n}`;if(document.getElementById(id)&&!maps[id])mkMap(id,ll=>setStop(key,dir,n,ll.lat,ll.lng))})}
+function stopToggle(key,dir,n){let yes=document.getElementById(`${key}-${dir}-q${n}`).value==="yes";document.getElementById(`${key}-${dir}-s${n}`).classList.toggle("hidden",!yes);if(n===1&&!yes)document.getElementById(`${key}-${dir}-s2`).classList.add("hidden");setTimeout(()=>{initStopMaps(key,dir);Object.values(maps).forEach(m=>m.invalidateSize())},50)}
+function setStop(key,dir,n,lat,lng){let id=`${key}-${dir}-map${n}`,mk=id+"mk";S.trips[key][dir].stops[n-1]=S.trips[key][dir].stops[n-1]||{};Object.assign(S.trips[key][dir].stops[n-1],{lat,lng});if(marks[mk])marks[mk].setLatLng([lat,lng]);else marks[mk]=L.marker([lat,lng],{draggable:true}).addTo(maps[id]).on("dragend",e=>{let x=e.target.getLatLng();setStop(key,dir,n,x.lat,x.lng)});maps[id].setView([lat,lng],15);save()}
+async function findStop(key,dir,n){let a=document.getElementById(`${key}-${dir}-a${n}`),msg=document.getElementById(`${key}-${dir}-msg${n}`),q=a.value.trim();if(!q){msg.innerHTML='<span class="bad">Escriba una dirección o marque el punto en el mapa.</span>';return}try{let d=await geo(q);if(!d){msg.innerHTML='<span class="bad">No encontrado. Corrija o marque el punto en el mapa.</span>';return}setStop(key,dir,n,+d.lat,+d.lon);S.trips[key][dir].stops[n-1].text=q;msg.innerHTML='<span class="ok">Ubicación encontrada.</span>'}catch(e){msg.innerHTML='<span class="bad">No se pudo buscar. Marque el punto en el mapa.</span>'}}
+function setCow(lat,lng){let t=S.trips.cow.destination;t.lat=lat;t.lng=lng;if(marks.cow)marks.cow.setLatLng([lat,lng]);else marks.cow=L.marker([lat,lng],{draggable:true}).addTo(maps.cowMap).on("dragend",e=>{let x=e.target.getLatLng();setCow(x.lat,x.lng)});maps.cowMap.setView([lat,lng],15);cowMsg.innerHTML='<span class="ok">Coworking ubicado.</span>'}
+async function findCow(){let q=cowText.value.trim();if(!q){cowMsg.innerHTML='<span class="bad">Ingrese la dirección del coworking.</span>';return}try{let d=await geo(q);if(!d){cowMsg.innerHTML='<span class="bad">No encontrado. Corrija o marque en el mapa.</span>';return}S.trips.cow.destination.text=q;setCow(+d.lat,+d.lon)}catch(e){cowMsg.innerHTML='<span class="bad">No se pudo buscar. Puede marcarlo en el mapa.</span>'}}
+function ret(key,same){S.trips[key].sameReturn=same;document.getElementById("back-"+key).classList.toggle("hidden",same);if(!same)setTimeout(()=>{initStopMaps(key,"back");Object.values(maps).forEach(m=>m.invalidateSize())},50)}
+function collectLeg(key,dir){let o={modes:[],stops:[]};o.modes.push(document.getElementById(`${key}-${dir}-m1`).value);let q1=document.getElementById(`${key}-${dir}-q1`).value==="yes";if(q1){let s=S.trips[key][dir].stops[0];o.stops.push({...s,text:document.getElementById(`${key}-${dir}-a1`).value});o.modes.push(document.getElementById(`${key}-${dir}-m2`).value);let q2=document.getElementById(`${key}-${dir}-q2`).value==="yes";if(q2){let s2=S.trips[key][dir].stops[1];o.stops.push({...s2,text:document.getElementById(`${key}-${dir}-a2`).value});o.modes.push(document.getElementById(`${key}-${dir}-m3`).value)}}return o}
+function sendForm(){let e=[];["bio","circ","cow"].forEach(k=>{if(!S.trips[k])return;let out=collectLeg(k,"out");if(out.stops.some(x=>x.lat==null))e.push(`Complete las paradas de ida de ${k}.`);S.trips[k].out=out;if(!S.trips[k].sameReturn){let back=collectLeg(k,"back");if(back.stops.some(x=>x.lat==null))e.push(`Complete las paradas de retorno de ${k}.`);S.trips[k].back=back}else S.trips[k].back={sameAsOut:true};});e3.innerHTML=e.join("<br>");if(e.length)return;S.home.text=homeText.value.trim();datos_json.value=JSON.stringify(S);submitNetlify()}
+
+async function submitNetlify(){
+  const btn=document.querySelector('#s3 .primary');
+  const old=btn.textContent;
+  btn.disabled=true;btn.textContent="Enviando…";
+  e3.innerHTML="";
+  try{
+    const form=document.getElementById("form");
+    const body=new URLSearchParams(new FormData(form)).toString();
+    const res=await fetch("/submit.html",{
+      method:"POST",
+      headers:{"Content-Type":"application/x-www-form-urlencoded"},
+      body
+    });
+    if(!res.ok) throw new Error("HTTP "+res.status);
+    localStorage.removeItem("mobV4");
+    form.classList.add("hidden");
+    document.querySelector(".progress").classList.add("hidden");
+    document.getElementById("successBox").classList.remove("hidden");
+    scrollTo(0,0);
+  }catch(err){
+    e3.innerHTML='<b>No se pudo registrar la respuesta.</b> Sus datos continúan en pantalla. Vuelva a intentar; si el problema continúa, comuníquelo al administrador.';
+    btn.disabled=false;btn.textContent=old;
+  }
+}
+
+function save(){try{localStorage.setItem("mobV4",JSON.stringify(S))}catch(e){}}
+document.getElementById("form").addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.tagName==="INPUT"){e.preventDefault()}},true);
+</script></body></html>

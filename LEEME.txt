@@ -1,0 +1,15 @@
+FORMULARIO MOVILIDAD V4.3 - CORRECCIÓN DE ENVÍO NETLIFY
+
+CORRECCIÓN PRINCIPAL
+- Se agregó submit.html con un formulario Netlify estático y explícito.
+- Netlify puede detectar este formulario directamente durante el deploy.
+- El formulario se llama: movilidad-2026-v43
+- La encuesta envía datos a /submit.html.
+- Si Netlify responde correctamente, la propia encuesta muestra:
+  “Sus datos fueron registrados exitosamente”.
+
+DESPUÉS DE SUBIR EL ZIP
+1. Espere a Published.
+2. Abra Forms.
+3. Debe aparecer movilidad-2026-v43.
+4. Recién después haga una prueba de envío.
