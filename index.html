@@ -1,6 +1,6 @@
 <!doctype html><html lang="es"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Encuesta anónima de movilidad 2026</title>
+<title>Encuesta de medios de transporte de los trabajadores de Sinba - Lima</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <style>
 :root{--p:#673ab7;--bg:#f0ebf8;--b:#dadce0;--bad:#b3261e;--ok:#137333}
@@ -15,19 +15,21 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{border:1px solid 
 .map{height:270px;border-radius:8px;margin-top:8px}.choice{display:flex;gap:16px;flex-wrap:wrap;margin:10px 0}.choice label{display:flex;gap:6px;align-items:center}
 @media(max-width:720px){.grid{grid-template-columns:1fr}.card{padding:15px}table{font-size:12px}}
 </style></head><body><div class="top"></div><div class="wrap">
-<div class="card"><h1>Encuesta anónima de movilidad 2026</h1>
-<p class="note">Registre su asistencia presencial y los medios de transporte utilizados para desplazarse al trabajo. No se solicita información de identificación personal.</p>
+<div class="card"><div style="text-align:center;margin-bottom:14px"><img src="sinba_logo.jfif" alt="Sinba" style="max-width:190px;max-height:90px;object-fit:contain"></div><h1>Encuesta de medios de transporte de los trabajadores de Sinba - Lima</h1>
+<h3>Huella de carbono 2025</h3>
+<div class="note"><p><b>Estimado(a) colaborador(a):</b></p><p>Actualmente, nos encontramos realizando la <b>medición de nuestra Huella de Carbono 2025 - Lima</b>. Como parte de este proceso, estamos recopilando información relacionada con las <b>emisiones generadas por el transporte diario de nuestros colaboradores</b>.</p><p>Tu participación en esta encuesta es fundamental, ya que nos permitirá contar con información confiable y representativa para calcular con mayor precisión nuestras emisiones de gases de efecto invernadero e identificar oportunidades de mejora y reducción.</p><p>Para fines de la investigación de tesis, la información será utilizada para estimar la huella de carbono asociada al desplazamiento casa-trabajo, considerando los medios de transporte, los tramos recorridos, la frecuencia de asistencia presencial y el uso de movilidad de la empresa.</p><p>Desarrollar esta encuesta no te tomará más de 5 minutos.</p></div>
 <div class="progress"><div class="bar" id="bar"></div></div></div>
-<form name="movilidad-2026-v43" method="POST" action="/" data-netlify="true" netlify-honeypot="bot-field" id="form">
-<input type="hidden" name="form-name" value="movilidad-2026-v43"><input type="hidden" name="datos_json" id="datos_json"><p class="hidden"><input name="bot-field"></p>
+<form name="movilidad-2025-v60" method="POST" action="/" data-netlify="true" netlify-honeypot="bot-field" id="form">
+<input type="hidden" name="form-name" value="movilidad-2025-v60"><input type="hidden" name="datos_json" id="datos_json"><p class="hidden"><input name="bot-field"></p>
 
-<section id="s1"><div class="card"><h2>1. Domicilio habitual y asistencia</h2>
+<section id="s1"><div class="card"><h2>1. Datos del colaborador, domicilio habitual y asistencia</h2>
+<label><b>Nombre y apellido</b><input id="fullName" type="text" placeholder="Escriba su nombre y apellido" autocomplete="name"></label>
 <p class="note">Indique su domicilio habitual. Este será automáticamente el punto de salida en la ida y el punto final en el retorno. No volveremos a preguntarlo en las rutas.</p>
 <label><b>Dirección o referencia de su domicilio</b><input id="homeText" type="text" placeholder="Ej.: Av. Los Héroes 123, San Juan de Miraflores, Lima" enterkeyhint="search"></label>
 <div class="grid" style="margin-top:8px"><button type="button" class="secondary" onclick="findHome()">Buscar dirección</button><span id="homeMsg" class="note"></span></div>
 <div id="homeMap" class="map"></div>
-<h3>Asistencia presencial 2026</h3><p class="note">Indique los días presenciales y, de ellos, cuántos utilizó movilidad de la empresa en ida y retorno.</p>
-<div class="scroll"><table><thead><tr><th>Mes</th><th>Días laborables</th><th>Días presenciales</th><th>Movilidad empresa ida</th><th>Movilidad empresa retorno</th></tr></thead><tbody id="months"></tbody></table></div>
+<h3>Asistencia presencial 2025</h3><p class="note"><b>¿Cuántos días trabajó de manera presencial en cada mes?</b> Indique los días presenciales y, de ellos, cuántos utilizó movilidad de la empresa en ida y retorno. Considere las <b>vacaciones, licencias, ausencias, descansos u otros días en los que no asistió presencialmente</b>.</p>
+<div class="scroll"><table><thead><tr><th>Mes</th><th>¿Cuántos días trabajó de manera presencial?</th><th>¿Cuántos días usó la movilidad de la empresa de ida?</th><th>¿Cuántos días usó la movilidad de la empresa de retorno?</th></tr></thead><tbody id="months"></tbody></table></div>
 <div id="e1" class="bad"></div><div class="actions"><span></span><button type="button" class="primary" onclick="next1()">Siguiente</button></div></div></section>
 
 <section id="s2" class="hidden"><div class="card"><h2>2. Días por lugar de trabajo</h2>
@@ -35,28 +37,28 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{border:1px solid 
 <div id="sites"></div><div id="e2" class="bad"></div><div class="actions"><button type="button" class="secondary" onclick="go(1)">Anterior</button><button type="button" class="primary" onclick="next2()">Siguiente</button></div></div></section>
 
 <section id="s3" class="hidden"><div class="card"><h2>3. Viajes habituales</h2>
-<p class="note">Complete únicamente los lugares a los que asistió. Biofábrica, Planta CIRC y Coworking son destinos conocidos por la empresa, por lo que no debe volver a registrar su ubicación. Cada sección incluye ida y retorno y permite como máximo dos paradas intermedias.</p>
+<p class="note">Complete únicamente los lugares a los que asistió. Cada sección incluye ida y retorno y permite como máximo dos puntos de cambio. Seleccione el medio de transporte realmente utilizado. <b>Si utilizó la movilidad de la empresa, debe seleccionar “Movilidad de la empresa” como tipo de transporte.</b></p>
 <div id="trips"></div><div class="note"><b>Sobre el kilometraje:</b> se registran únicamente los puntos reales donde cambia el medio de transporte. Cada tramo se conservará por separado para calcular posteriormente su recorrido sobre la red vial o el recorrido propio del sistema de transporte, evitando usar únicamente la distancia en línea recta.</div><div id="e3" class="bad"></div><div class="actions"><button type="button" class="secondary" onclick="go(2)">Anterior</button><button type="button" class="primary" onclick="sendForm()">Enviar encuesta</button></div></div></section>
 <button type="submit" id="nativeSubmit" class="hidden">Enviar</button></form>
 <section id="successBox" class="hidden">
 <div class="card" style="text-align:center;padding:38px">
 <h1>Sus datos fueron registrados exitosamente</h1>
-<p class="note">Gracias por completar la encuesta anónima de movilidad 2026.</p>
+<p class="note">Gracias por completar la Encuesta de medios de transporte de los trabajadores de Sinba - Lima.</p>
 <p class="ok"><b>La respuesta fue enviada correctamente.</b></p>
 </div>
 </section>
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script>
-const months=[["Enero",26],["Febrero",24],["Marzo",24],["Abril",26],["Mayo",24],["Junio",26],["Julio",24],["Agosto",24],["Septiembre",26],["Octubre",26],["Noviembre",24],["Diciembre",24]];
-const modes=["A pie","Bicicleta","Bicicleta eléctrica","Scooter","Scooter eléctrico","Automóvil propio","Motocicleta","Mototaxi","Taxi individual","Taxi compartido o carpool","Combi","Cúster o microbús","Autobús","Corredor complementario","Metropolitano","Metro de Lima","Movilidad de la empresa","Otro"];
+const months=[["Enero",31],["Febrero",28],["Marzo",31],["Abril",30],["Mayo",31],["Junio",30],["Julio",31],["Agosto",31],["Septiembre",30],["Octubre",31],["Noviembre",30],["Diciembre",31]];
+const modes=["A pie","Bicicleta","Bicicleta eléctrica","Scooter","Scooter eléctrico","Automóvil propio","Motocicleta","Mototaxi","Taxi individual","Taxi compartido o carpool","Combi","Cúster o microbús","Autobús","Corredor complementario","Metropolitano","Tren eléctrico","Movilidad de la empresa","Otro"];
 const fixed={
   bio:{name:"Biofábrica SINBA",address:"Q2FM+4J7, Villa El Salvador 15842, Perú, Lima, Provincia de Lima",lat:-12.219597,lng:-76.936306,known:true},
   circ:{name:"Planta CIRC SINBA",address:"Calle 1 Mz. X Lote 5A (o Calle 1 Nº 1688), Cooperativa Las Vertientes, Villa El Salvador 15842",lat:-12.219215,lng:-76.936050,known:true},
   cow:{name:"Coworking SINBA",address:"Calle José Félix Olcay 475, Miraflores, Lima 15048, Perú",mapsUrl:"https://maps.google.com/maps?vet=10CAAQoqAOahcKEwjY6decr4uXAxUAAAAAHQAAAAAQDw..i&mstk=AUtExfB4yyGUhsfPJm2QUT217R0nUQTFG-Zc0vm55wWtQOP58YjbcMuxkiqyNViTFtxW_4SZoYZ1JBZi2piVgH2V9BmWOHRDNW7w0z4fU60ek39srooFvP678sQnJzJT4AvWvLcKm_uFR8r39jG_UoWGUB7YmQe2uyEXOFNo0SWRsPAmhLU&pvq=Cg0vZy8xMW4zejltcWhsgAEBkAEB&fvr=1&cs=0&um=1&ie=UTF-8&fb=1&gl=pe&sa=X&ftid=0x9105c9c2666c6eb3:0x7ef307cb75903a02",lat:null,lng:null,known:true}
 };
-let S={version:"5.2",routeModel:"transportes-y-puntos-de-cambio",distanceMethod:"ruta-real-pendiente-de-calculo",home:{text:"",lat:null,lng:null},months:[],sites:{},trips:{}};let maps={},marks={};
-months.forEach((m,i)=>document.getElementById("months").insertAdjacentHTML("beforeend",`<tr><td>${m[0]}</td><td>${m[1]}</td><td><input id="p${i}" type="number" min="0" max="${m[1]}" value="${m[1]}"></td><td><input id="i${i}" type="number" min="0" value="${m[1]}"></td><td><input id="r${i}" type="number" min="0" value="${m[1]}"></td></tr>`));
+let S={version:"6.0-2025",fullName:"",routeModel:"transportes-y-puntos-de-cambio",distanceMethod:"ruta-real-pendiente-de-calculo",home:{text:"",lat:null,lng:null},months:[],sites:{},trips:{}};let maps={},marks={};
+months.forEach((m,i)=>document.getElementById("months").insertAdjacentHTML("beforeend",`<tr><td>${m[0]}</td><td><input id="p${i}" type="number" min="0" max="${m[1]}" value="0"></td><td><input id="i${i}" type="number" min="0" max="${m[1]}" value="0"></td><td><input id="r${i}" type="number" min="0" max="${m[1]}" value="0"></td></tr>`));
 function mkMap(id,click){let m=L.map(id).setView([-12.10,-77.02],10);L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap"}).addTo(m);if(click)m.on("click",e=>click(e.latlng));maps[id]=m;return m}
 let hm=mkMap("homeMap",ll=>setHome(ll.lat,ll.lng));
 function setHome(lat,lng){S.home.lat=lat;S.home.lng=lng;if(marks.home)marks.home.setLatLng([lat,lng]);else marks.home=L.marker([lat,lng],{draggable:true}).addTo(hm).on("dragend",e=>{let x=e.target.getLatLng();S.home.lat=x.lat;S.home.lng=x.lng;save()});hm.setView([lat,lng],15);homeMsg.innerHTML='<span class="ok">Domicilio ubicado. Puede mover el marcador para corregirlo.</span>';save()}
@@ -65,7 +67,7 @@ async function findHome(){let q=homeText.value.trim();if(!q){homeMsg.innerHTML='
 homeText.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();findHome()}});
 function go(n){["s1","s2","s3"].forEach(x=>document.getElementById(x).classList.add("hidden"));document.getElementById("s"+n).classList.remove("hidden");bar.style.width=(n*33.33)+"%";scrollTo(0,0);setTimeout(()=>Object.values(maps).forEach(m=>m.invalidateSize()),100)}
 function val(id){return +(document.getElementById(id)?.value||0)}
-function next1(){let e=[];S.home.text=homeText.value.trim();if(S.home.lat===null)e.push("Ubique su domicilio mediante la búsqueda o marcándolo en el mapa.");S.months=[];months.forEach((m,x)=>{let p=val("p"+x),i=val("i"+x),r=val("r"+x);if(p>m[1])e.push(`${m[0]}: los días presenciales superan los días laborables.`);if(i>p||r>p)e.push(`${m[0]}: la movilidad de empresa no puede superar los días presenciales.`);S.months.push({month:m[0],working:m[1],present:p,companyOut:i,companyBack:r})});e1.innerHTML=e.join("<br>");if(!e.length){renderSites();go(2)}}
+function next1(){let e=[];S.fullName=fullName.value.trim();if(!S.fullName)e.push("Ingrese su nombre y apellido.");S.home.text=homeText.value.trim();if(S.home.lat===null)e.push("Ubique su domicilio mediante la búsqueda o marcándolo en el mapa.");S.months=[];months.forEach((m,x)=>{let p=val("p"+x),i=val("i"+x),r=val("r"+x);if(p>m[1])e.push(`${m[0]}: los días presenciales superan los días del mes.`);if(i>p||r>p)e.push(`${m[0]}: la movilidad de empresa no puede superar los días presenciales.`);S.months.push({month:m[0],working:m[1],present:p,companyOut:i,companyBack:r})});e1.innerHTML=e.join("<br>");if(!e.length){renderSites();go(2)}}
 function renderSites(){
   sites.innerHTML="";S.sites=S.sites||{};
   S.months.filter(x=>x.present).forEach((m,k)=>{
@@ -143,10 +145,6 @@ function tripSection(key,title){
   const destName=destination.name;
   trips.insertAdjacentHTML("beforeend",`<div class="route" id="trip-${key}">
     <h2>${title}</h2>
-    <p class="note"><b>Destino final:</b> ${destName}.<br>
-      <b>Dirección registrada:</b> ${destination.address||"Ubicación registrada en el sistema."}
-      ${destination.mapsUrl?`<br><a href="${destination.mapsUrl}" target="_blank" rel="noopener">Abrir Coworking SINBA en Google Maps</a>`:""}
-      <br>No necesita volver a escribir ni marcar el destino.</p>
     <h3>Ida: domicilio → ${destName}</h3>
     ${legHTML(key,"out")}
     <div class="point">
@@ -168,7 +166,7 @@ function tripSection(key,title){
 function legHTML(key,dir){
   return `<div class="point">
     <b>Medios de transporte utilizados</b>
-    <p class="note">Seleccione cuántos medios utilizó, en el orden real del viaje. Máximo 3. El sistema pedirá únicamente los puntos donde cambió de transporte.</p>
+    <p class="note">Seleccione cuántos medios utilizó, en el orden real del viaje. Máximo 3. El sistema pedirá únicamente los puntos donde cambió de transporte. <b>Si en algún tramo utilizó la movilidad de la empresa, seleccione “Movilidad de la empresa”.</b></p>
     <label>Número de transportes
       <select id="${key}-${dir}-count" onchange="renderLeg('${key}','${dir}')">
         <option value="1">1 transporte</option>
@@ -306,7 +304,7 @@ async function submitNetlify(){
       body
     });
     if(!res.ok) throw new Error("HTTP "+res.status);
-    localStorage.removeItem("mobV5");
+    localStorage.removeItem("mobV60_2025");
     form.classList.add("hidden");
     document.querySelector(".progress").classList.add("hidden");
     document.getElementById("successBox").classList.remove("hidden");
@@ -317,6 +315,6 @@ async function submitNetlify(){
   }
 }
 
-function save(){try{localStorage.setItem("mobV5",JSON.stringify(S))}catch(e){}}
+function save(){try{localStorage.setItem("mobV60_2025",JSON.stringify(S))}catch(e){}}
 document.getElementById("form").addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.tagName==="INPUT"){e.preventDefault()}},true);
 </script></body></html>

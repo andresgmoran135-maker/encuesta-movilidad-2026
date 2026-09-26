@@ -1,33 +1,14 @@
-FORMULARIO MOVILIDAD V5.2
+ENCUESTA DE MEDIOS DE TRANSPORTE DE LOS TRABAJADORES DE SINBA - LIMA
+Huella de carbono 2025
+Versión 6.0 - 2025
 
-DESTINOS FIJOS
-1. Biofábrica SINBA
-   Q2FM+4J7, Villa El Salvador 15842, Perú, Lima, Provincia de Lima.
-   Coordenadas técnicas conservadas: -12.219597, -76.936306.
-
-2. Planta CIRC SINBA
-   Calle 1 Mz. X Lote 5A (o Calle 1 Nº 1688), Cooperativa Las Vertientes,
-   Villa El Salvador 15842.
-   Coordenadas técnicas conservadas: -12.219215, -76.936050.
-
-3. Coworking SINBA
-   Calle José Félix Olcay 475, Miraflores, Lima 15048, Perú.
-   Se conserva además el enlace de Google Maps proporcionado por el usuario.
-
-LÓGICA DE RUTAS
-- 1 transporte: ningún punto de cambio.
-- 2 transportes: 1 punto de cambio.
-- 3 transportes: 2 puntos de cambio.
-- Solo se piden los puntos donde cambia el medio de transporte.
-- Domicilio y destino final se reutilizan automáticamente.
-- Retorno igual: se reutiliza la ida.
-- Retorno diferente: se captura con la misma lógica.
-
-IMPORTANTE PARA KILOMETRAJE
-La dirección del Coworking ya queda fija. No se inventaron coordenadas numéricas
-del Coworking porque no se verificaron con suficiente precisión. El formulario
-conserva el enlace de Google Maps proporcionado como referencia de ubicación.
-
-NETLIFY
-Se conserva el nombre del formulario movilidad-2026-v43 para mantener las
-respuestas en el mismo formulario ya detectado por Netlify.
+Cambios principales:
+- Solicita nombre y apellido.
+- Incorpora instructivo para la medición de Huella de Carbono 2025 y uso en tesis.
+- Asistencia presencial correspondiente a 2025.
+- Días de asistencia y movilidad de empresa inician en 0 para evitar respuestas por defecto.
+- Se consideran vacaciones, licencias, ausencias y otros días no presenciales.
+- Se cambió “Metro de Lima” por “Tren eléctrico”.
+- Se retiró de la vista del encuestado el bloque de destino final/dirección; las coordenadas quedan internas para el cálculo.
+- Se indica expresamente seleccionar “Movilidad de la empresa” cuando corresponda.
+- Formulario Netlify: movilidad-2025-v60.
