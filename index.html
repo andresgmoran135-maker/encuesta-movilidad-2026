@@ -29,7 +29,7 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{border:1px solid 
 <div class="grid" style="margin-top:8px"><button type="button" class="secondary" onclick="findHome()">Buscar dirección</button><span id="homeMsg" class="note"></span></div>
 <div id="homeMap" class="map"></div>
 <h3>Asistencia presencial 2025</h3><p class="note"><b>¿Cuántos días trabajó de manera presencial en cada mes?</b> Indique los días presenciales y, de ellos, cuántos utilizó movilidad de la empresa en ida y retorno. Considere las <b>vacaciones, licencias, ausencias, descansos u otros días en los que no asistió presencialmente</b>.</p>
-<div class="scroll"><table><thead><tr><th>Mes</th><th>¿Cuántos días trabajó de manera presencial?</th><th>¿Cuántos días usó la movilidad de la empresa de ida?</th><th>¿Cuántos días usó la movilidad de la empresa de retorno?</th></tr></thead><tbody id="months"></tbody></table></div>
+<div class="scroll"><table><thead><tr><th>Mes</th><th>Días hábiles</th><th>¿Cuántos días trabajó de manera presencial?</th><th>¿Cuántos días usó la movilidad de la empresa de ida?</th><th>¿Cuántos días usó la movilidad de la empresa de retorno?</th></tr></thead><tbody id="months"></tbody></table></div>
 <div id="e1" class="bad"></div><div class="actions"><span></span><button type="button" class="primary" onclick="next1()">Siguiente</button></div></div></section>
 
 <section id="s2" class="hidden"><div class="card"><h2>2. Días por lugar de trabajo</h2>
@@ -50,15 +50,15 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{border:1px solid 
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script>
-const months=[["Enero",31],["Febrero",28],["Marzo",31],["Abril",30],["Mayo",31],["Junio",30],["Julio",31],["Agosto",31],["Septiembre",30],["Octubre",31],["Noviembre",30],["Diciembre",31]];
+const months=[["Enero",26],["Febrero",24],["Marzo",24],["Abril",26],["Mayo",24],["Junio",26],["Julio",24],["Agosto",24],["Septiembre",26],["Octubre",26],["Noviembre",24],["Diciembre",24]];
 const modes=["A pie","Bicicleta","Bicicleta eléctrica","Scooter","Scooter eléctrico","Automóvil propio","Motocicleta","Mototaxi","Taxi individual","Taxi compartido o carpool","Combi","Cúster o microbús","Autobús","Corredor complementario","Metropolitano","Tren eléctrico","Movilidad de la empresa","Otro"];
 const fixed={
   bio:{name:"Biofábrica SINBA",address:"Q2FM+4J7, Villa El Salvador 15842, Perú, Lima, Provincia de Lima",lat:-12.219597,lng:-76.936306,known:true},
   circ:{name:"Planta CIRC SINBA",address:"Calle 1 Mz. X Lote 5A (o Calle 1 Nº 1688), Cooperativa Las Vertientes, Villa El Salvador 15842",lat:-12.219215,lng:-76.936050,known:true},
   cow:{name:"Coworking SINBA",address:"Calle José Félix Olcay 475, Miraflores, Lima 15048, Perú",mapsUrl:"https://maps.google.com/maps?vet=10CAAQoqAOahcKEwjY6decr4uXAxUAAAAAHQAAAAAQDw..i&mstk=AUtExfB4yyGUhsfPJm2QUT217R0nUQTFG-Zc0vm55wWtQOP58YjbcMuxkiqyNViTFtxW_4SZoYZ1JBZi2piVgH2V9BmWOHRDNW7w0z4fU60ek39srooFvP678sQnJzJT4AvWvLcKm_uFR8r39jG_UoWGUB7YmQe2uyEXOFNo0SWRsPAmhLU&pvq=Cg0vZy8xMW4zejltcWhsgAEBkAEB&fvr=1&cs=0&um=1&ie=UTF-8&fb=1&gl=pe&sa=X&ftid=0x9105c9c2666c6eb3:0x7ef307cb75903a02",lat:null,lng:null,known:true}
 };
-let S={version:"6.0-2025",fullName:"",routeModel:"transportes-y-puntos-de-cambio",distanceMethod:"ruta-real-pendiente-de-calculo",home:{text:"",lat:null,lng:null},months:[],sites:{},trips:{}};let maps={},marks={};
-months.forEach((m,i)=>document.getElementById("months").insertAdjacentHTML("beforeend",`<tr><td>${m[0]}</td><td><input id="p${i}" type="number" min="0" max="${m[1]}" value="0"></td><td><input id="i${i}" type="number" min="0" max="${m[1]}" value="0"></td><td><input id="r${i}" type="number" min="0" max="${m[1]}" value="0"></td></tr>`));
+let S={version:"6.1-2025",fullName:"",routeModel:"transportes-y-puntos-de-cambio",distanceMethod:"ruta-real-pendiente-de-calculo",home:{text:"",lat:null,lng:null},months:[],sites:{},trips:{}};let maps={},marks={};
+months.forEach((m,i)=>document.getElementById("months").insertAdjacentHTML("beforeend",`<tr><td>${m[0]}</td><td><b>${m[1]}</b></td><td><input id="p${i}" type="number" min="0" max="${m[1]}" value="${m[1]}"></td><td><input id="i${i}" type="number" min="0" max="${m[1]}" value="${m[1]}"></td><td><input id="r${i}" type="number" min="0" max="${m[1]}" value="${m[1]}"></td></tr>`));
 function mkMap(id,click){let m=L.map(id).setView([-12.10,-77.02],10);L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap"}).addTo(m);if(click)m.on("click",e=>click(e.latlng));maps[id]=m;return m}
 let hm=mkMap("homeMap",ll=>setHome(ll.lat,ll.lng));
 function setHome(lat,lng){S.home.lat=lat;S.home.lng=lng;if(marks.home)marks.home.setLatLng([lat,lng]);else marks.home=L.marker([lat,lng],{draggable:true}).addTo(hm).on("dragend",e=>{let x=e.target.getLatLng();S.home.lat=x.lat;S.home.lng=x.lng;save()});hm.setView([lat,lng],15);homeMsg.innerHTML='<span class="ok">Domicilio ubicado. Puede mover el marcador para corregirlo.</span>';save()}
@@ -67,7 +67,7 @@ async function findHome(){let q=homeText.value.trim();if(!q){homeMsg.innerHTML='
 homeText.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();findHome()}});
 function go(n){["s1","s2","s3"].forEach(x=>document.getElementById(x).classList.add("hidden"));document.getElementById("s"+n).classList.remove("hidden");bar.style.width=(n*33.33)+"%";scrollTo(0,0);setTimeout(()=>Object.values(maps).forEach(m=>m.invalidateSize()),100)}
 function val(id){return +(document.getElementById(id)?.value||0)}
-function next1(){let e=[];S.fullName=fullName.value.trim();if(!S.fullName)e.push("Ingrese su nombre y apellido.");S.home.text=homeText.value.trim();if(S.home.lat===null)e.push("Ubique su domicilio mediante la búsqueda o marcándolo en el mapa.");S.months=[];months.forEach((m,x)=>{let p=val("p"+x),i=val("i"+x),r=val("r"+x);if(p>m[1])e.push(`${m[0]}: los días presenciales superan los días del mes.`);if(i>p||r>p)e.push(`${m[0]}: la movilidad de empresa no puede superar los días presenciales.`);S.months.push({month:m[0],working:m[1],present:p,companyOut:i,companyBack:r})});e1.innerHTML=e.join("<br>");if(!e.length){renderSites();go(2)}}
+function next1(){let e=[];S.fullName=fullName.value.trim();if(!S.fullName)e.push("Ingrese su nombre y apellido.");S.home.text=homeText.value.trim();if(S.home.lat===null)e.push("Ubique su domicilio mediante la búsqueda o marcándolo en el mapa.");S.months=[];months.forEach((m,x)=>{let p=val("p"+x),i=val("i"+x),r=val("r"+x);if(p>m[1])e.push(`${m[0]}: los días presenciales superan los días hábiles de referencia.`);if(i>p||r>p)e.push(`${m[0]}: la movilidad de empresa no puede superar los días presenciales.`);S.months.push({month:m[0],working:m[1],present:p,companyOut:i,companyBack:r})});e1.innerHTML=e.join("<br>");if(!e.length){renderSites();go(2)}}
 function renderSites(){
   sites.innerHTML="";S.sites=S.sites||{};
   S.months.filter(x=>x.present).forEach((m,k)=>{
