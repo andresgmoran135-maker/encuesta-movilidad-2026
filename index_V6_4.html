@@ -1,0 +1,343 @@
+<!doctype html><html lang="es"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Encuesta de medios de transporte de los trabajadores de Sinba - Lima</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+:root{--p:#673ab7;--bg:#f0ebf8;--b:#dadce0;--bad:#b3261e;--ok:#137333}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font:15px Arial;color:#202124}.top{height:10px;background:var(--p)}
+.wrap{max-width:980px;margin:24px auto;padding:0 14px}.card{background:#fff;border:1px solid var(--b);border-radius:10px;padding:22px;margin:14px 0}
+h1{font-size:26px;margin:0 0 10px}h2{font-size:20px}.note{color:#5f6368;line-height:1.5}.bad{color:var(--bad)}.ok{color:var(--ok)}
+input,select,button{font:inherit}input[type=text],input[type=number],select{width:100%;padding:10px;border:1px solid #bbb;border-radius:6px}
+button{border:0;border-radius:6px;padding:11px 18px;cursor:pointer}.primary{background:var(--p);color:#fff}.secondary{background:#eee}
+.hidden{display:none!important}.actions{display:flex;justify-content:space-between;gap:10px;margin-top:18px}.progress{height:8px;background:#ddd;border-radius:8px;overflow:hidden}.bar{height:100%;background:var(--p);width:25%}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{border:1px solid #ddd;padding:7px;text-align:center}th{background:#f7f5fb}.scroll{overflow:auto}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.route{border:1px solid #ddd;border-radius:8px;padding:14px;margin:12px 0}.point{border-left:4px solid var(--p);padding:12px;margin:10px 0;background:#fafafa}
+.map{height:270px;border-radius:8px;margin-top:8px}.choice{display:flex;gap:16px;flex-wrap:wrap;margin:10px 0}.choice label{display:flex;gap:6px;align-items:center}
+@media(max-width:720px){.grid{grid-template-columns:1fr}.card{padding:15px}table{font-size:12px}}
+</style></head><body><div class="top"></div><div class="wrap">
+<div class="progress"><div class="bar" id="bar"></div></div>
+<form name="movilidad-2025-v60" method="POST" action="/" data-netlify="true" netlify-honeypot="bot-field" id="form">
+<input type="hidden" name="form-name" value="movilidad-2025-v60"><input type="hidden" name="datos_json" id="datos_json"><p class="hidden"><input name="bot-field"></p>
+
+<section id="s1"><div class="card"><div style="text-align:center;margin-bottom:14px"><img src="sinba_logo.jfif" alt="Sinba" style="max-width:190px;max-height:90px;object-fit:contain"></div><h1>Encuesta de medios de transporte de los trabajadores de Sinba - Lima</h1>
+<h3>Huella de carbono 2025</h3>
+<div class="note"><p><b>Estimado(a) colaborador(a):</b></p><p>Actualmente, nos encontramos realizando la <b>medición de nuestra Huella de Carbono 2025 - Lima</b>. Como parte de este proceso, estamos recopilando información relacionada con las <b>emisiones generadas por el transporte diario de nuestros colaboradores</b>.</p><p>Tu participación en esta encuesta es fundamental, ya que nos permitirá contar con información confiable y representativa para calcular con mayor precisión nuestras emisiones de gases de efecto invernadero e identificar oportunidades de mejora y reducción.</p><p>Para fines de la investigación de tesis, la información será utilizada para estimar la huella de carbono asociada al desplazamiento casa-trabajo, considerando los medios de transporte, los tramos recorridos, la frecuencia de asistencia presencial y el uso de movilidad de la empresa.</p><p><strong>La participación en la presente encuesta es voluntaria.</strong> La información recopilada será tratada de manera confidencial y utilizada únicamente con fines académicos, en el marco de la investigación de tesis y para la estimación de la Huella de Carbono 2025. Los datos obtenidos serán analizados de manera conjunta y empleados exclusivamente para los fines establecidos en la investigación.</p>
+<p>Desarrollar esta encuesta no te tomará más de 5 minutos.</p></div>
+</div><div class="card"><h2>1. Datos del colaborador, domicilio habitual y asistencia</h2>
+<label><b>Nombre y apellido</b><input id="fullName" type="text" placeholder="Escriba su nombre y apellido" autocomplete="name"></label>
+<p class="note">Indique su domicilio habitual. Este será automáticamente el punto de salida en la ida y el punto final en el retorno. No volveremos a preguntarlo en las rutas.</p>
+<label><b>Dirección o referencia de su domicilio</b><input id="homeText" type="text" placeholder="Ej.: Av. Los Héroes 123, San Juan de Miraflores, Lima" enterkeyhint="search"></label>
+<div class="grid" style="margin-top:8px"><button type="button" class="secondary" onclick="findHome()">Buscar dirección</button><span id="homeMsg" class="note"></span></div>
+<div id="homeMap" class="map"></div>
+<h3>Asistencia presencial 2025</h3><p class="note"><b>¿Cuántos días trabajó de manera presencial en cada mes?</b> Indique los días presenciales y, de ellos, cuántos utilizó movilidad de la empresa en ida y retorno. Considere las <b>vacaciones, licencias, ausencias, descansos u otros días en los que no asistió presencialmente</b>.</p>
+<div class="scroll"><table><thead><tr><th>Mes</th><th>Días hábiles</th><th>¿Cuántos días trabajó de manera presencial?</th><th>¿Cuántos días usó la movilidad de la empresa de ida?</th><th>¿Cuántos días usó la movilidad de la empresa de retorno?</th></tr></thead><tbody id="months"></tbody></table></div>
+<div id="e1" class="bad"></div><div class="actions"><span></span><button type="button" class="primary" onclick="next1()">Siguiente</button></div></div></section>
+
+<section id="s2" class="hidden"><div class="card" style="text-align:center;padding:16px"><img src="sinba_logo.jfif" alt="Sinba" style="max-width:145px;max-height:68px;object-fit:contain"><h1 style="margin-bottom:0">Encuesta de medios de transporte de los trabajadores de Sinba - Lima</h1></div><div class="card"><h2>2. Días por lugar de trabajo</h2>
+<p class="note">Indique si durante cada mes trabajó en uno, dos o tres lugares. Si trabajó en un solo lugar, los días presenciales se asignarán automáticamente a ese lugar. Si trabajó en dos o tres, distribuya únicamente los días entre los lugares utilizados.</p>
+<div id="sites"></div><div id="e2" class="bad"></div><div class="actions"><button type="button" class="secondary" onclick="go(1)">Anterior</button><button type="button" class="primary" onclick="next2()">Siguiente</button></div></div></section>
+
+<section id="s3" class="hidden"><div class="card" style="text-align:center;padding:16px"><img src="sinba_logo.jfif" alt="Sinba" style="max-width:145px;max-height:68px;object-fit:contain"><h1 style="margin-bottom:0">Encuesta de medios de transporte de los trabajadores de Sinba - Lima</h1></div><div class="card"><h2>3. Viajes habituales</h2>
+<div class="note"><b>Indicaciones principales</b><p>Complete únicamente los lugares a los que asistió. Para cada viaje seleccione de 1 a 3 medios de transporte, en el orden real en que los utilizó. El sistema solicitará solamente los puntos donde cambió de transporte.</p><p>Si utilizó la movilidad de la empresa, seleccione <b>“Movilidad de la empresa”</b>. Si selecciona <b>“Automóvil propio”</b>, deberá indicar el tipo de combustible utilizado: Gasolina, Diésel, GLP, GNV, Híbrido o Eléctrico.</p><p>Estas indicaciones se aplican a todos los viajes de ida y retorno que registre a continuación.</p></div>
+<div id="trips"></div><div class="note"><b>Sobre el kilometraje:</b> se registran únicamente los puntos reales donde cambia el medio de transporte. Cada tramo se conservará por separado para calcular posteriormente su recorrido sobre la red vial o el recorrido propio del sistema de transporte, evitando usar únicamente la distancia en línea recta.</div><div id="e3" class="bad"></div><div class="actions"><button type="button" class="secondary" onclick="go(2)">Anterior</button><button type="button" class="primary" onclick="sendForm()">Enviar encuesta</button></div></div></section>
+<button type="submit" id="nativeSubmit" class="hidden">Enviar</button></form>
+<section id="successBox" class="hidden">
+<div class="card" style="text-align:center;padding:38px">
+<h1>Sus datos fueron registrados exitosamente</h1>
+<p class="note">Gracias por completar la Encuesta de medios de transporte de los trabajadores de Sinba - Lima.</p>
+<p class="ok"><b>La respuesta fue enviada correctamente.</b></p>
+</div>
+</section>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script>
+const months=[["Enero",26],["Febrero",24],["Marzo",24],["Abril",26],["Mayo",24],["Junio",26],["Julio",24],["Agosto",24],["Septiembre",26],["Octubre",26],["Noviembre",24],["Diciembre",24]];
+const modes=["A pie","Bicicleta","Bicicleta eléctrica","Scooter","Scooter eléctrico","Automóvil propio","Motocicleta","Mototaxi","Taxi individual","Taxi compartido o carpool","Combi","Cúster o microbús","Autobús","Corredor complementario","Metropolitano","Tren eléctrico","Movilidad de la empresa","Otro"];
+const fixed={
+  bio:{name:"Biofábrica SINBA",address:"Q2FM+4J7, Villa El Salvador 15842, Perú, Lima, Provincia de Lima",lat:-12.219597,lng:-76.936306,known:true},
+  circ:{name:"Planta CIRC SINBA",address:"Calle 1 Mz. X Lote 5A (o Calle 1 Nº 1688), Cooperativa Las Vertientes, Villa El Salvador 15842",lat:-12.219215,lng:-76.936050,known:true},
+  cow:{name:"Coworking SINBA",address:"Calle José Félix Olcay 475, Miraflores, Lima 15048, Perú",mapsUrl:"https://maps.google.com/maps?vet=10CAAQoqAOahcKEwjY6decr4uXAxUAAAAAHQAAAAAQDw..i&mstk=AUtExfB4yyGUhsfPJm2QUT217R0nUQTFG-Zc0vm55wWtQOP58YjbcMuxkiqyNViTFtxW_4SZoYZ1JBZi2piVgH2V9BmWOHRDNW7w0z4fU60ek39srooFvP678sQnJzJT4AvWvLcKm_uFR8r39jG_UoWGUB7YmQe2uyEXOFNo0SWRsPAmhLU&pvq=Cg0vZy8xMW4zejltcWhsgAEBkAEB&fvr=1&cs=0&um=1&ie=UTF-8&fb=1&gl=pe&sa=X&ftid=0x9105c9c2666c6eb3:0x7ef307cb75903a02",lat:null,lng:null,known:true}
+};
+let S={version:"6.2-2025",fullName:"",routeModel:"transportes-y-puntos-de-cambio",distanceMethod:"ruta-real-pendiente-de-calculo",home:{text:"",lat:null,lng:null},months:[],sites:{},trips:{}};let maps={},marks={};
+months.forEach((m,i)=>document.getElementById("months").insertAdjacentHTML("beforeend",`<tr><td>${m[0]}</td><td><b>${m[1]}</b></td><td><input id="p${i}" type="number" min="0" max="${m[1]}" value="${m[1]}"></td><td><input id="i${i}" type="number" min="0" max="${m[1]}" value="${m[1]}"></td><td><input id="r${i}" type="number" min="0" max="${m[1]}" value="${m[1]}"></td></tr>`));
+function mkMap(id,click){let m=L.map(id).setView([-12.10,-77.02],10);L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap"}).addTo(m);if(click)m.on("click",e=>click(e.latlng));maps[id]=m;return m}
+let hm=mkMap("homeMap",ll=>setHome(ll.lat,ll.lng));
+function setHome(lat,lng){S.home.lat=lat;S.home.lng=lng;if(marks.home)marks.home.setLatLng([lat,lng]);else marks.home=L.marker([lat,lng],{draggable:true}).addTo(hm).on("dragend",e=>{let x=e.target.getLatLng();S.home.lat=x.lat;S.home.lng=x.lng;save()});hm.setView([lat,lng],15);homeMsg.innerHTML='<span class="ok">Domicilio ubicado. Puede mover el marcador para corregirlo.</span>';save()}
+async function geo(q){let r=await fetch("https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=pe&q="+encodeURIComponent(q));if(!r.ok)throw 0;let d=await r.json();return d[0]}
+async function findHome(){let q=homeText.value.trim();if(!q){homeMsg.innerHTML='<span class="bad">Escriba una dirección o marque el domicilio en el mapa.</span>';return}homeMsg.textContent="Buscando…";try{let d=await geo(q);if(!d){homeMsg.innerHTML='<span class="bad">No encontramos la dirección. Corríjala o marque el punto directamente en el mapa.</span>';return}S.home.text=q;setHome(+d.lat,+d.lon)}catch(e){homeMsg.innerHTML='<span class="bad">No fue posible buscar ahora. Puede marcar el domicilio directamente en el mapa.</span>'}}
+homeText.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();findHome()}});
+function go(n){["s1","s2","s3"].forEach(x=>document.getElementById(x).classList.add("hidden"));document.getElementById("s"+n).classList.remove("hidden");bar.style.width=(n*33.33)+"%";scrollTo(0,0);setTimeout(()=>Object.values(maps).forEach(m=>m.invalidateSize()),100)}
+function val(id){return +(document.getElementById(id)?.value||0)}
+function next1(){let e=[];S.fullName=fullName.value.trim();if(!S.fullName)e.push("Ingrese su nombre y apellido.");S.home.text=homeText.value.trim();if(S.home.lat===null)e.push("Ubique su domicilio mediante la búsqueda o marcándolo en el mapa.");S.months=[];months.forEach((m,x)=>{let p=val("p"+x),i=val("i"+x),r=val("r"+x);if(p>m[1])e.push(`${m[0]}: los días presenciales superan los días hábiles de referencia.`);if(i>p||r>p)e.push(`${m[0]}: la movilidad de empresa no puede superar los días presenciales.`);S.months.push({month:m[0],working:m[1],present:p,companyOut:i,companyBack:r})});e1.innerHTML=e.join("<br>");if(!e.length){renderSites();go(2)}}
+function renderSites(){
+  sites.innerHTML="";S.sites=S.sites||{};
+  S.months.filter(x=>x.present).forEach((m,k)=>{
+    sites.insertAdjacentHTML("beforeend",`<div class="route" id="site-${k}">
+      <b>${m.month}: ${m.present} días presenciales</b>
+      <p class="note">¿En cuántos lugares trabajó presencialmente durante este mes?</p>
+      <select id="count-${k}" onchange="renderMonthPlaces(${k},'${m.month}',${m.present})">
+        <option value="1">En un solo lugar</option>
+        <option value="2">En dos lugares</option>
+        <option value="3">En los tres lugares</option>
+      </select>
+      <div id="places-${k}"></div><div id="bal${k}" class="bad"></div>
+    </div>`);
+    renderMonthPlaces(k,m.month,m.present);
+  });
+}
+function placeOptions(exclude=[]){
+  return [["bio","Biofábrica"],["circ","Planta CIRC"],["cow","Coworking"]]
+    .filter(x=>!exclude.includes(x[0])).map(x=>`<option value="${x[0]}">${x[1]}</option>`).join("");
+}
+function renderMonthPlaces(k,month,present){
+  const count=+document.getElementById("count-"+k).value,box=document.getElementById("places-"+k);
+  box.innerHTML="";
+  for(let j=0;j<count;j++){
+    box.insertAdjacentHTML("beforeend",`<div class="grid" style="margin-top:10px">
+      <label>${j===0?"Lugar principal":"Lugar "+(j+1)}
+        <select class="placeSel" data-k="${k}" data-j="${j}" onchange="syncPlaceRows(${k},${present})">${placeOptions()}</select>
+      </label>
+      <label>Días en este lugar
+        <input class="placeDays" data-k="${k}" data-j="${j}" type="number" min="0" max="${present}" value="${j===0?present:0}" oninput="balanceAdaptive(${k},${present})">
+      </label>
+    </div>`);
+  }
+  syncPlaceRows(k,present);
+}
+function syncPlaceRows(k,present){
+  const sels=[...document.querySelectorAll(`.placeSel[data-k="${k}"]`)];
+  sels.forEach((s,idx)=>{
+    const current=s.value,other=sels.filter((_,j)=>j!==idx).map(x=>x.value);
+    s.innerHTML=placeOptions(other);
+    if([...s.options].some(o=>o.value===current))s.value=current;
+  });
+  balanceAdaptive(k,present);
+}
+function balanceAdaptive(k,present){
+  const days=[...document.querySelectorAll(`.placeDays[data-k="${k}"]`)];
+  if(days.length===1){days[0].value=present;days[0].readOnly=true}
+  else{
+    days[0].readOnly=true;
+    const others=days.slice(1).reduce((a,x)=>a+(+x.value||0),0);
+    days[0].value=Math.max(0,present-others);
+  }
+  const total=days.reduce((a,x)=>a+(+x.value||0),0),b=document.getElementById("bal"+k);
+  b.textContent=total===present?`Total asignado: ${total} de ${present} días.`:`Debe asignar exactamente ${present} días. Actualmente: ${total}.`;
+  b.className=total===present?"ok":"bad";
+}
+function next2(){
+  let e=[];S.sites={};const active=S.months.filter(x=>x.present);
+  active.forEach((m,k)=>{
+    let o={bio:0,circ:0,cow:0};
+    const sels=[...document.querySelectorAll(`.placeSel[data-k="${k}"]`)],days=[...document.querySelectorAll(`.placeDays[data-k="${k}"]`)];
+    const chosen=sels.map(x=>x.value);
+    if(new Set(chosen).size!==chosen.length)e.push(`${m.month}: no repita el mismo lugar.`);
+    sels.forEach((s,j)=>o[s.value]=+days[j].value||0);
+    if(Object.values(o).reduce((a,b)=>a+b,0)!==m.present)e.push(`${m.month}: distribuya exactamente ${m.present} días.`);
+    S.sites[m.month]=o;
+  });
+  e2.innerHTML=e.join("<br>");if(!e.length){renderTrips();go(3)}
+}
+function used(key){return Object.values(S.sites).some(x=>x[key]>0)}
+function renderTrips(){trips.innerHTML="";S.trips={};if(used("bio"))tripSection("bio","Viaje a Biofábrica");if(used("circ"))tripSection("circ","Viaje a Planta CIRC");if(used("cow"))tripSection("cow","Viaje a Coworking");}
+function tripSection(key,title){
+  const destination=key==="bio"?fixed.bio:key==="circ"?fixed.circ:fixed.cow;
+  S.trips[key]={destination:destination,out:{modes:[],stops:[]},sameReturn:true,back:{modes:[],stops:[]}};
+  const destName=destination.name;
+  trips.insertAdjacentHTML("beforeend",`<div class="route" id="trip-${key}">
+    <h2>${title}</h2>
+    <h3>Ida: domicilio → ${destName}</h3>
+    ${legHTML(key,"out")}
+    <div class="point">
+      <b>Retorno</b>
+      <p>¿Regresó utilizando exactamente la misma ruta y los mismos medios de transporte?</p>
+      <div class="choice">
+        <label><input type="radio" name="ret-${key}" value="yes" checked onchange="ret('${key}',true)"> Sí</label>
+        <label><input type="radio" name="ret-${key}" value="no" onchange="ret('${key}',false)"> No</label>
+      </div>
+    </div>
+    <div id="back-${key}" class="hidden">
+      <h3>Retorno: ${destName} → domicilio</h3>
+      ${legHTML(key,"back")}
+    </div>
+  </div>`);
+  setTimeout(()=>renderLeg(key,"out"),50);
+}
+
+function legHTML(key,dir){
+  return `<div class="point">
+    <b>Medios de transporte utilizados</b>
+    <label>Número de transportes
+      <select id="${key}-${dir}-count" onchange="renderLeg('${key}','${dir}')">
+        <option value="1">1 transporte</option>
+        <option value="2">2 transportes</option>
+        <option value="3">3 transportes</option>
+      </select>
+    </label>
+    <div id="${key}-${dir}-modes"></div>
+    <div id="${key}-${dir}-changes"></div>
+  </div>`;
+}
+
+function toggleFuel(key,dir,i){
+  const mode=document.getElementById(`${key}-${dir}-m${i}`);
+  const box=document.getElementById(`${key}-${dir}-fuelBox${i}`);
+  if(!mode||!box)return;
+  const show=mode.value==="Automóvil propio";
+  box.classList.toggle("hidden",!show);
+  if(!show){const fuel=document.getElementById(`${key}-${dir}-fuel${i}`);if(fuel)fuel.value="";}
+}
+
+function modeOptions(selected=""){
+  return modes.map(x=>`<option ${x===selected?"selected":""}>${x}</option>`).join("");
+}
+
+function renderLeg(key,dir){
+  const count=+(document.getElementById(`${key}-${dir}-count`)?.value||1);
+  const oldModes=[];
+  for(let i=1;i<=3;i++){
+    const el=document.getElementById(`${key}-${dir}-m${i}`);
+    if(el)oldModes.push(el.value);
+  }
+  const modesBox=document.getElementById(`${key}-${dir}-modes`);
+  const changesBox=document.getElementById(`${key}-${dir}-changes`);
+  if(!modesBox||!changesBox)return;
+
+  let mh="";
+  for(let i=1;i<=count;i++){
+    const from=i===1?(dir==="out"?"Domicilio":"Lugar de trabajo"):`Punto de cambio ${i-1}`;
+    const to=i===count?(dir==="out"?"Lugar de trabajo":"Domicilio"):`Punto de cambio ${i}`;
+    mh+=`<div class="grid" style="margin-top:10px">
+      <label>Tramo ${i}: ${from} → ${to}
+        <select id="${key}-${dir}-m${i}" onchange="toggleFuel('${key}','${dir}',${i})">${modeOptions(oldModes[i-1]||"")}</select>
+      </label>
+      <div id="${key}-${dir}-fuelBox${i}" class="hidden">
+        <label><b>Señalar el tipo de combustible</b>
+          <select id="${key}-${dir}-fuel${i}">
+            <option value="">Seleccione una opción</option>
+            <option>Gasolina</option><option>Diésel</option><option>GLP</option><option>GNV</option><option>Híbrido</option><option>Eléctrico</option>
+          </select>
+        </label>
+      </div>
+    </div>`;
+  }
+  modesBox.innerHTML=mh;
+  for(let i=1;i<=count;i++) toggleFuel(key,dir,i);
+
+  let ch="";
+  for(let n=1;n<count;n++){
+    ch+=`<div class="point">
+      <b>Punto de cambio ${n}</b>
+      <p class="note">Marque únicamente el lugar donde termina el tramo ${n} y comienza el tramo ${n+1}.</p>
+      <label>Dirección, estación o referencia
+        <input id="${key}-${dir}-a${n}" type="text" placeholder="Ej.: Estación Naranjal del Metropolitano">
+      </label>
+      <button type="button" class="secondary" onclick="findStop('${key}','${dir}',${n})">Buscar ubicación</button>
+      <span id="${key}-${dir}-msg${n}"></span>
+      <div id="${key}-${dir}-map${n}" class="map"></div>
+    </div>`;
+  }
+  changesBox.innerHTML=ch;
+
+  // Preserve previously captured points where possible.
+  setTimeout(()=>{
+    initStopMaps(key,dir,count);
+    const saved=(S.trips[key]&&S.trips[key][dir]&&S.trips[key][dir].stops)||[];
+    saved.slice(0,count-1).forEach((p,idx)=>{
+      const n=idx+1;
+      const a=document.getElementById(`${key}-${dir}-a${n}`);
+      if(a&&p.text)a.value=p.text;
+      if(p.lat!=null&&p.lng!=null)setStop(key,dir,n,p.lat,p.lng);
+    });
+    Object.values(maps).forEach(m=>m.invalidateSize());
+  },50);
+}
+
+function initStopMaps(key,dir,count){
+  for(let n=1;n<count;n++){
+    const id=`${key}-${dir}-map${n}`;
+    if(document.getElementById(id)&&!maps[id])mkMap(id,ll=>setStop(key,dir,n,ll.lat,ll.lng));
+  }
+}
+
+function setStop(key,dir,n,lat,lng){
+  const id=`${key}-${dir}-map${n}`,mk=id+"mk";
+  S.trips[key][dir].stops[n-1]=S.trips[key][dir].stops[n-1]||{};
+  Object.assign(S.trips[key][dir].stops[n-1],{lat,lng});
+  if(marks[mk])marks[mk].setLatLng([lat,lng]);
+  else marks[mk]=L.marker([lat,lng],{draggable:true}).addTo(maps[id]).on("dragend",e=>{
+    const x=e.target.getLatLng();setStop(key,dir,n,x.lat,x.lng);
+  });
+  maps[id].setView([lat,lng],15);
+  save();
+}
+
+async function findStop(key,dir,n){
+  const a=document.getElementById(`${key}-${dir}-a${n}`);
+  const msg=document.getElementById(`${key}-${dir}-msg${n}`);
+  const q=a.value.trim();
+  if(!q){msg.innerHTML='<span class="bad">Escriba una dirección, estación o marque el punto en el mapa.</span>';return}
+  msg.textContent="Buscando…";
+  try{
+    const d=await geo(q);
+    if(!d){msg.innerHTML='<span class="bad">No encontrado. Corrija el texto o marque el punto directamente en el mapa.</span>';return}
+    setStop(key,dir,n,+d.lat,+d.lon);
+    S.trips[key][dir].stops[n-1].text=q;
+    msg.innerHTML='<span class="ok">Punto de cambio ubicado.</span>';
+  }catch(e){
+    msg.innerHTML='<span class="bad">No se pudo buscar. Puede marcar el punto directamente en el mapa.</span>';
+  }
+}
+
+function ret(key,same){
+  S.trips[key].sameReturn=same;
+  document.getElementById("back-"+key).classList.toggle("hidden",same);
+  if(!same)setTimeout(()=>renderLeg(key,"back"),50);
+}
+
+function collectLeg(key,dir){
+  const count=+(document.getElementById(`${key}-${dir}-count`)?.value||1);
+  const o={transportCount:count,modes:[],fuels:[],stops:[]};
+  for(let i=1;i<=count;i++){
+    const mode=document.getElementById(`${key}-${dir}-m${i}`).value;
+    const fuel=document.getElementById(`${key}-${dir}-fuel${i}`)?.value||"";
+    o.modes.push(mode);
+    o.fuels.push(mode==="Automóvil propio"?fuel:"");
+  }
+  for(let n=1;n<count;n++){
+    const saved=(S.trips[key][dir].stops||[])[n-1]||{};
+    const a=document.getElementById(`${key}-${dir}-a${n}`);
+    o.stops.push({...saved,text:a?a.value.trim():""});
+  }
+  return o;
+}
+function sendForm(){let e=[];["bio","circ","cow"].forEach(k=>{if(!S.trips[k])return;let out=collectLeg(k,"out");if(out.stops.some(x=>x.lat==null))e.push(`Complete todos los puntos de cambio de la ida a ${S.trips[k].destination.name}.`);out.modes.forEach((m,i)=>{if(m==="Automóvil propio"&&!out.fuels[i])e.push(`Indique el tipo de combustible del automóvil propio en la ida a ${S.trips[k].destination.name}, tramo ${i+1}.`)});S.trips[k].out=out;if(!S.trips[k].sameReturn){let back=collectLeg(k,"back");if(back.stops.some(x=>x.lat==null))e.push(`Complete todos los puntos de cambio del retorno desde ${S.trips[k].destination.name}.`);back.modes.forEach((m,i)=>{if(m==="Automóvil propio"&&!back.fuels[i])e.push(`Indique el tipo de combustible del automóvil propio en el retorno desde ${S.trips[k].destination.name}, tramo ${i+1}.`)});S.trips[k].back=back}else S.trips[k].back={sameAsOut:true};});e3.innerHTML=e.join("<br>");if(e.length)return;S.home.text=homeText.value.trim();datos_json.value=JSON.stringify(S);submitNetlify()}
+
+async function submitNetlify(){
+  const btn=document.querySelector('#s3 .primary');
+  const old=btn.textContent;
+  btn.disabled=true;btn.textContent="Enviando…";
+  e3.innerHTML="";
+  try{
+    const form=document.getElementById("form");
+    const body=new URLSearchParams(new FormData(form)).toString();
+    const res=await fetch("/submit.html",{
+      method:"POST",
+      headers:{"Content-Type":"application/x-www-form-urlencoded"},
+      body
+    });
+    if(!res.ok) throw new Error("HTTP "+res.status);
+    localStorage.removeItem("mobV63_2025");
+    form.classList.add("hidden");
+    document.querySelector(".progress").classList.add("hidden");
+    document.getElementById("successBox").classList.remove("hidden");
+    scrollTo(0,0);
+  }catch(err){
+    e3.innerHTML='<b>No se pudo registrar la respuesta.</b> Sus datos continúan en pantalla. Vuelva a intentar; si el problema continúa, comuníquelo al administrador.';
+    btn.disabled=false;btn.textContent=old;
+  }
+}
+
+function save(){try{localStorage.setItem("mobV63_2025",JSON.stringify(S))}catch(e){}}
+document.getElementById("form").addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.tagName==="INPUT"){e.preventDefault()}},true);
+</script></body></html>
