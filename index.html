@@ -15,14 +15,14 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{border:1px solid 
 .map{height:270px;border-radius:8px;margin-top:8px}.choice{display:flex;gap:16px;flex-wrap:wrap;margin:10px 0}.choice label{display:flex;gap:6px;align-items:center}
 @media(max-width:720px){.grid{grid-template-columns:1fr}.card{padding:15px}table{font-size:12px}}
 </style></head><body><div class="top"></div><div class="wrap">
-<div class="card"><div style="text-align:center;margin-bottom:14px"><img src="sinba_logo.jfif" alt="Sinba" style="max-width:190px;max-height:90px;object-fit:contain"></div><h1>Encuesta de medios de transporte de los trabajadores de Sinba - Lima</h1>
-<h3>Huella de carbono 2025</h3>
-<div class="note"><p><b>Estimado(a) colaborador(a):</b></p><p>Actualmente, nos encontramos realizando la <b>medición de nuestra Huella de Carbono 2025 - Lima</b>. Como parte de este proceso, estamos recopilando información relacionada con las <b>emisiones generadas por el transporte diario de nuestros colaboradores</b>.</p><p>Tu participación en esta encuesta es fundamental, ya que nos permitirá contar con información confiable y representativa para calcular con mayor precisión nuestras emisiones de gases de efecto invernadero e identificar oportunidades de mejora y reducción.</p><p>Para fines de la investigación de tesis, la información será utilizada para estimar la huella de carbono asociada al desplazamiento casa-trabajo, considerando los medios de transporte, los tramos recorridos, la frecuencia de asistencia presencial y el uso de movilidad de la empresa.</p><p>Desarrollar esta encuesta no te tomará más de 5 minutos.</p></div>
-<div class="progress"><div class="bar" id="bar"></div></div></div>
+<div class="progress"><div class="bar" id="bar"></div></div>
 <form name="movilidad-2025-v60" method="POST" action="/" data-netlify="true" netlify-honeypot="bot-field" id="form">
 <input type="hidden" name="form-name" value="movilidad-2025-v60"><input type="hidden" name="datos_json" id="datos_json"><p class="hidden"><input name="bot-field"></p>
 
-<section id="s1"><div class="card"><h2>1. Datos del colaborador, domicilio habitual y asistencia</h2>
+<section id="s1"><div class="card"><div style="text-align:center;margin-bottom:14px"><img src="sinba_logo.jfif" alt="Sinba" style="max-width:190px;max-height:90px;object-fit:contain"></div><h1>Encuesta de medios de transporte de los trabajadores de Sinba - Lima</h1>
+<h3>Huella de carbono 2025</h3>
+<div class="note"><p><b>Estimado(a) colaborador(a):</b></p><p>Actualmente, nos encontramos realizando la <b>medición de nuestra Huella de Carbono 2025 - Lima</b>. Como parte de este proceso, estamos recopilando información relacionada con las <b>emisiones generadas por el transporte diario de nuestros colaboradores</b>.</p><p>Tu participación en esta encuesta es fundamental, ya que nos permitirá contar con información confiable y representativa para calcular con mayor precisión nuestras emisiones de gases de efecto invernadero e identificar oportunidades de mejora y reducción.</p><p>Para fines de la investigación de tesis, la información será utilizada para estimar la huella de carbono asociada al desplazamiento casa-trabajo, considerando los medios de transporte, los tramos recorridos, la frecuencia de asistencia presencial y el uso de movilidad de la empresa.</p><p>Desarrollar esta encuesta no te tomará más de 5 minutos.</p></div>
+</div><div class="card"><h2>1. Datos del colaborador, domicilio habitual y asistencia</h2>
 <label><b>Nombre y apellido</b><input id="fullName" type="text" placeholder="Escriba su nombre y apellido" autocomplete="name"></label>
 <p class="note">Indique su domicilio habitual. Este será automáticamente el punto de salida en la ida y el punto final en el retorno. No volveremos a preguntarlo en las rutas.</p>
 <label><b>Dirección o referencia de su domicilio</b><input id="homeText" type="text" placeholder="Ej.: Av. Los Héroes 123, San Juan de Miraflores, Lima" enterkeyhint="search"></label>
@@ -32,11 +32,11 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{border:1px solid 
 <div class="scroll"><table><thead><tr><th>Mes</th><th>Días hábiles</th><th>¿Cuántos días trabajó de manera presencial?</th><th>¿Cuántos días usó la movilidad de la empresa de ida?</th><th>¿Cuántos días usó la movilidad de la empresa de retorno?</th></tr></thead><tbody id="months"></tbody></table></div>
 <div id="e1" class="bad"></div><div class="actions"><span></span><button type="button" class="primary" onclick="next1()">Siguiente</button></div></div></section>
 
-<section id="s2" class="hidden"><div class="card"><h2>2. Días por lugar de trabajo</h2>
+<section id="s2" class="hidden"><div class="card" style="text-align:center;padding:16px"><img src="sinba_logo.jfif" alt="Sinba" style="max-width:145px;max-height:68px;object-fit:contain"><h1 style="margin-bottom:0">Encuesta de medios de transporte de los trabajadores de Sinba - Lima</h1></div><div class="card"><h2>2. Días por lugar de trabajo</h2>
 <p class="note">Indique si durante cada mes trabajó en uno, dos o tres lugares. Si trabajó en un solo lugar, los días presenciales se asignarán automáticamente a ese lugar. Si trabajó en dos o tres, distribuya únicamente los días entre los lugares utilizados.</p>
 <div id="sites"></div><div id="e2" class="bad"></div><div class="actions"><button type="button" class="secondary" onclick="go(1)">Anterior</button><button type="button" class="primary" onclick="next2()">Siguiente</button></div></div></section>
 
-<section id="s3" class="hidden"><div class="card"><h2>3. Viajes habituales</h2>
+<section id="s3" class="hidden"><div class="card" style="text-align:center;padding:16px"><img src="sinba_logo.jfif" alt="Sinba" style="max-width:145px;max-height:68px;object-fit:contain"><h1 style="margin-bottom:0">Encuesta de medios de transporte de los trabajadores de Sinba - Lima</h1></div><div class="card"><h2>3. Viajes habituales</h2>
 <div class="note"><b>Indicaciones principales</b><p>Complete únicamente los lugares a los que asistió. Para cada viaje seleccione de 1 a 3 medios de transporte, en el orden real en que los utilizó. El sistema solicitará solamente los puntos donde cambió de transporte.</p><p>Si utilizó la movilidad de la empresa, seleccione <b>“Movilidad de la empresa”</b>. Si selecciona <b>“Automóvil propio”</b>, deberá indicar el tipo de combustible utilizado: Gasolina, Diésel, GLP, GNV, Híbrido o Eléctrico.</p><p>Estas indicaciones se aplican a todos los viajes de ida y retorno que registre a continuación.</p></div>
 <div id="trips"></div><div class="note"><b>Sobre el kilometraje:</b> se registran únicamente los puntos reales donde cambia el medio de transporte. Cada tramo se conservará por separado para calcular posteriormente su recorrido sobre la red vial o el recorrido propio del sistema de transporte, evitando usar únicamente la distancia en línea recta.</div><div id="e3" class="bad"></div><div class="actions"><button type="button" class="secondary" onclick="go(2)">Anterior</button><button type="button" class="primary" onclick="sendForm()">Enviar encuesta</button></div></div></section>
 <button type="submit" id="nativeSubmit" class="hidden">Enviar</button></form>
@@ -211,7 +211,7 @@ function renderLeg(key,dir){
         <select id="${key}-${dir}-m${i}" onchange="toggleFuel('${key}','${dir}',${i})">${modeOptions(oldModes[i-1]||"")}</select>
       </label>
       <div id="${key}-${dir}-fuelBox${i}" class="hidden">
-        <label><b>Si en la pregunta anterior seleccionó la opción AUTO PROPIO, por favor, especificar: ¿Qué tipo de combustible utilizó su vehículo?</b>
+        <label><b>Señalar el tipo de combustible</b>
           <select id="${key}-${dir}-fuel${i}">
             <option value="">Seleccione una opción</option>
             <option>Gasolina</option><option>Diésel</option><option>GLP</option><option>GNV</option><option>Híbrido</option><option>Eléctrico</option>
@@ -326,7 +326,7 @@ async function submitNetlify(){
       body
     });
     if(!res.ok) throw new Error("HTTP "+res.status);
-    localStorage.removeItem("mobV62_2025");
+    localStorage.removeItem("mobV63_2025");
     form.classList.add("hidden");
     document.querySelector(".progress").classList.add("hidden");
     document.getElementById("successBox").classList.remove("hidden");
@@ -337,6 +337,6 @@ async function submitNetlify(){
   }
 }
 
-function save(){try{localStorage.setItem("mobV62_2025",JSON.stringify(S))}catch(e){}}
+function save(){try{localStorage.setItem("mobV63_2025",JSON.stringify(S))}catch(e){}}
 document.getElementById("form").addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.tagName==="INPUT"){e.preventDefault()}},true);
 </script></body></html>
