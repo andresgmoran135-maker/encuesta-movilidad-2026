@@ -37,7 +37,7 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{border:1px solid 
 <div id="sites"></div><div id="e2" class="bad"></div><div class="actions"><button type="button" class="secondary" onclick="go(1)">Anterior</button><button type="button" class="primary" onclick="next2()">Siguiente</button></div></div></section>
 
 <section id="s3" class="hidden"><div class="card"><h2>3. Viajes habituales</h2>
-<p class="note">Complete únicamente los lugares a los que asistió. Cada sección incluye ida y retorno y permite como máximo dos puntos de cambio. Seleccione el medio de transporte realmente utilizado. <b>Si utilizó la movilidad de la empresa, debe seleccionar “Movilidad de la empresa” como tipo de transporte.</b></p>
+<div class="note"><b>Indicaciones principales</b><p>Complete únicamente los lugares a los que asistió. Para cada viaje seleccione de 1 a 3 medios de transporte, en el orden real en que los utilizó. El sistema solicitará solamente los puntos donde cambió de transporte.</p><p>Si utilizó la movilidad de la empresa, seleccione <b>“Movilidad de la empresa”</b>. Si selecciona <b>“Automóvil propio”</b>, deberá indicar el tipo de combustible utilizado: Gasolina, Diésel, GLP, GNV, Híbrido o Eléctrico.</p><p>Estas indicaciones se aplican a todos los viajes de ida y retorno que registre a continuación.</p></div>
 <div id="trips"></div><div class="note"><b>Sobre el kilometraje:</b> se registran únicamente los puntos reales donde cambia el medio de transporte. Cada tramo se conservará por separado para calcular posteriormente su recorrido sobre la red vial o el recorrido propio del sistema de transporte, evitando usar únicamente la distancia en línea recta.</div><div id="e3" class="bad"></div><div class="actions"><button type="button" class="secondary" onclick="go(2)">Anterior</button><button type="button" class="primary" onclick="sendForm()">Enviar encuesta</button></div></div></section>
 <button type="submit" id="nativeSubmit" class="hidden">Enviar</button></form>
 <section id="successBox" class="hidden">
@@ -57,7 +57,7 @@ const fixed={
   circ:{name:"Planta CIRC SINBA",address:"Calle 1 Mz. X Lote 5A (o Calle 1 Nº 1688), Cooperativa Las Vertientes, Villa El Salvador 15842",lat:-12.219215,lng:-76.936050,known:true},
   cow:{name:"Coworking SINBA",address:"Calle José Félix Olcay 475, Miraflores, Lima 15048, Perú",mapsUrl:"https://maps.google.com/maps?vet=10CAAQoqAOahcKEwjY6decr4uXAxUAAAAAHQAAAAAQDw..i&mstk=AUtExfB4yyGUhsfPJm2QUT217R0nUQTFG-Zc0vm55wWtQOP58YjbcMuxkiqyNViTFtxW_4SZoYZ1JBZi2piVgH2V9BmWOHRDNW7w0z4fU60ek39srooFvP678sQnJzJT4AvWvLcKm_uFR8r39jG_UoWGUB7YmQe2uyEXOFNo0SWRsPAmhLU&pvq=Cg0vZy8xMW4zejltcWhsgAEBkAEB&fvr=1&cs=0&um=1&ie=UTF-8&fb=1&gl=pe&sa=X&ftid=0x9105c9c2666c6eb3:0x7ef307cb75903a02",lat:null,lng:null,known:true}
 };
-let S={version:"6.1-2025",fullName:"",routeModel:"transportes-y-puntos-de-cambio",distanceMethod:"ruta-real-pendiente-de-calculo",home:{text:"",lat:null,lng:null},months:[],sites:{},trips:{}};let maps={},marks={};
+let S={version:"6.2-2025",fullName:"",routeModel:"transportes-y-puntos-de-cambio",distanceMethod:"ruta-real-pendiente-de-calculo",home:{text:"",lat:null,lng:null},months:[],sites:{},trips:{}};let maps={},marks={};
 months.forEach((m,i)=>document.getElementById("months").insertAdjacentHTML("beforeend",`<tr><td>${m[0]}</td><td><b>${m[1]}</b></td><td><input id="p${i}" type="number" min="0" max="${m[1]}" value="${m[1]}"></td><td><input id="i${i}" type="number" min="0" max="${m[1]}" value="${m[1]}"></td><td><input id="r${i}" type="number" min="0" max="${m[1]}" value="${m[1]}"></td></tr>`));
 function mkMap(id,click){let m=L.map(id).setView([-12.10,-77.02],10);L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap"}).addTo(m);if(click)m.on("click",e=>click(e.latlng));maps[id]=m;return m}
 let hm=mkMap("homeMap",ll=>setHome(ll.lat,ll.lng));
@@ -166,7 +166,6 @@ function tripSection(key,title){
 function legHTML(key,dir){
   return `<div class="point">
     <b>Medios de transporte utilizados</b>
-    <p class="note">Seleccione cuántos medios utilizó, en el orden real del viaje. Máximo 3. El sistema pedirá únicamente los puntos donde cambió de transporte. <b>Si en algún tramo utilizó la movilidad de la empresa, seleccione “Movilidad de la empresa”.</b></p>
     <label>Número de transportes
       <select id="${key}-${dir}-count" onchange="renderLeg('${key}','${dir}')">
         <option value="1">1 transporte</option>
@@ -177,6 +176,15 @@ function legHTML(key,dir){
     <div id="${key}-${dir}-modes"></div>
     <div id="${key}-${dir}-changes"></div>
   </div>`;
+}
+
+function toggleFuel(key,dir,i){
+  const mode=document.getElementById(`${key}-${dir}-m${i}`);
+  const box=document.getElementById(`${key}-${dir}-fuelBox${i}`);
+  if(!mode||!box)return;
+  const show=mode.value==="Automóvil propio";
+  box.classList.toggle("hidden",!show);
+  if(!show){const fuel=document.getElementById(`${key}-${dir}-fuel${i}`);if(fuel)fuel.value="";}
 }
 
 function modeOptions(selected=""){
@@ -200,11 +208,20 @@ function renderLeg(key,dir){
     const to=i===count?(dir==="out"?"Lugar de trabajo":"Domicilio"):`Punto de cambio ${i}`;
     mh+=`<div class="grid" style="margin-top:10px">
       <label>Tramo ${i}: ${from} → ${to}
-        <select id="${key}-${dir}-m${i}">${modeOptions(oldModes[i-1]||"")}</select>
+        <select id="${key}-${dir}-m${i}" onchange="toggleFuel('${key}','${dir}',${i})">${modeOptions(oldModes[i-1]||"")}</select>
       </label>
+      <div id="${key}-${dir}-fuelBox${i}" class="hidden">
+        <label><b>Si en la pregunta anterior seleccionó la opción AUTO PROPIO, por favor, especificar: ¿Qué tipo de combustible utilizó su vehículo?</b>
+          <select id="${key}-${dir}-fuel${i}">
+            <option value="">Seleccione una opción</option>
+            <option>Gasolina</option><option>Diésel</option><option>GLP</option><option>GNV</option><option>Híbrido</option><option>Eléctrico</option>
+          </select>
+        </label>
+      </div>
     </div>`;
   }
   modesBox.innerHTML=mh;
+  for(let i=1;i<=count;i++) toggleFuel(key,dir,i);
 
   let ch="";
   for(let n=1;n<count;n++){
@@ -279,8 +296,13 @@ function ret(key,same){
 
 function collectLeg(key,dir){
   const count=+(document.getElementById(`${key}-${dir}-count`)?.value||1);
-  const o={transportCount:count,modes:[],stops:[]};
-  for(let i=1;i<=count;i++)o.modes.push(document.getElementById(`${key}-${dir}-m${i}`).value);
+  const o={transportCount:count,modes:[],fuels:[],stops:[]};
+  for(let i=1;i<=count;i++){
+    const mode=document.getElementById(`${key}-${dir}-m${i}`).value;
+    const fuel=document.getElementById(`${key}-${dir}-fuel${i}`)?.value||"";
+    o.modes.push(mode);
+    o.fuels.push(mode==="Automóvil propio"?fuel:"");
+  }
   for(let n=1;n<count;n++){
     const saved=(S.trips[key][dir].stops||[])[n-1]||{};
     const a=document.getElementById(`${key}-${dir}-a${n}`);
@@ -288,7 +310,7 @@ function collectLeg(key,dir){
   }
   return o;
 }
-function sendForm(){let e=[];["bio","circ","cow"].forEach(k=>{if(!S.trips[k])return;let out=collectLeg(k,"out");if(out.stops.some(x=>x.lat==null))e.push(`Complete todos los puntos de cambio de la ida a ${S.trips[k].destination.name}.`);S.trips[k].out=out;if(!S.trips[k].sameReturn){let back=collectLeg(k,"back");if(back.stops.some(x=>x.lat==null))e.push(`Complete todos los puntos de cambio del retorno desde ${S.trips[k].destination.name}.`);S.trips[k].back=back}else S.trips[k].back={sameAsOut:true};});e3.innerHTML=e.join("<br>");if(e.length)return;S.home.text=homeText.value.trim();datos_json.value=JSON.stringify(S);submitNetlify()}
+function sendForm(){let e=[];["bio","circ","cow"].forEach(k=>{if(!S.trips[k])return;let out=collectLeg(k,"out");if(out.stops.some(x=>x.lat==null))e.push(`Complete todos los puntos de cambio de la ida a ${S.trips[k].destination.name}.`);out.modes.forEach((m,i)=>{if(m==="Automóvil propio"&&!out.fuels[i])e.push(`Indique el tipo de combustible del automóvil propio en la ida a ${S.trips[k].destination.name}, tramo ${i+1}.`)});S.trips[k].out=out;if(!S.trips[k].sameReturn){let back=collectLeg(k,"back");if(back.stops.some(x=>x.lat==null))e.push(`Complete todos los puntos de cambio del retorno desde ${S.trips[k].destination.name}.`);back.modes.forEach((m,i)=>{if(m==="Automóvil propio"&&!back.fuels[i])e.push(`Indique el tipo de combustible del automóvil propio en el retorno desde ${S.trips[k].destination.name}, tramo ${i+1}.`)});S.trips[k].back=back}else S.trips[k].back={sameAsOut:true};});e3.innerHTML=e.join("<br>");if(e.length)return;S.home.text=homeText.value.trim();datos_json.value=JSON.stringify(S);submitNetlify()}
 
 async function submitNetlify(){
   const btn=document.querySelector('#s3 .primary');
@@ -304,7 +326,7 @@ async function submitNetlify(){
       body
     });
     if(!res.ok) throw new Error("HTTP "+res.status);
-    localStorage.removeItem("mobV60_2025");
+    localStorage.removeItem("mobV62_2025");
     form.classList.add("hidden");
     document.querySelector(".progress").classList.add("hidden");
     document.getElementById("successBox").classList.remove("hidden");
@@ -315,6 +337,6 @@ async function submitNetlify(){
   }
 }
 
-function save(){try{localStorage.setItem("mobV60_2025",JSON.stringify(S))}catch(e){}}
+function save(){try{localStorage.setItem("mobV62_2025",JSON.stringify(S))}catch(e){}}
 document.getElementById("form").addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.tagName==="INPUT"){e.preventDefault()}},true);
 </script></body></html>
